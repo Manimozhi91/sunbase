@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>View Customers</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+            
+        th {
+            background-color: grey;
+            color: white;
+        }
+        .action-icons {
+            display: flex;
+            justify-content: center;
+        }
+        .action-icons a {
+            margin: 0 5px;
+            color: dodgerblue;
+            text-decoration: none;
+        }
+        .action-icons a:hover {
+            color: blue;
+        }
+        .pagination {
+            margin-top: 20px;
+            list-style-type: none;
+            display: flex;
+            justify-content: center;
+        }
+        .pagination li {
+            margin: 0 5px;
+        }
+        .pagination li.disabled a {
+            color: grey;
+        }
+        .pagination li.active a {
+            color: blue;
+        }
+    </style>
+</head>
+<body>
+    <div style="text-align: center;color: red">
+        <h2>Customer List</h2>
+        <a style="color: pink" th:href="@{/customers/new}" >Add Customer</a>
+    </div>
+    
+    <div style="margin-top: 20px;">
+        <form th:action="@{/customers/search}" method="get" class="form-inline my-2 my-lg-0">
+            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" name="keyword">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        </form>
+    </div>
+ 	<a href="/customers/sync" class="btn btn-primary">Sync Customers</a>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Street</th>
+                <th>Address</th>
+                <th>City</th>
+                <th>State</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="customer : ${customers.content}">
+                <td th:text="${customer.id}"></td>
+                <td th:text="${customer.firstName}"></td>
+                <td th:text="${customer.lastName}"></td>
+                <td th:text="${customer.street}"></td>
+                <td th:text="${customer.address}"></td>
+                <td th:text="${customer.city}"></td>
+                <td th:text="${customer.state}"></td>
+                <td th:text="${customer.email}"></td>
+                <td th:text="${customer.phone}"></td>
+                <td class="action-icons">
+					<a th:href="@{/customers/{id}(id=${customer.id})}" title="Edit Customer">
+					    <img src="/img/edit-icon.png" alt="Edit" width="20" height="20">
+					</a>
+					
+					<a th:href="@{/customers/delete/{id}(id=${customer.id})}" th:method="delete" onclick="return confirm('Are you sure you want to delete this customer?');">
+					    <img src="/img/delete-icon.jpg" alt="Delete" width="20" height="20">
+					</a>
+	      
+              
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <div th:if="${customers.totalPages > 1}">
+        <ul class="pagination">
+            <li th:class="${customers.first} ? 'disabled'">
+                <a th:href="@{${'/customers?page=' + (customers.number - 1) + '&size=' + customers.size + '&sortBy=' + customers.sort}}" th:text="'Previous'"></a>
+            </li>
+            <li th:each="pageNumber : ${#numbers.sequence(0, customers.totalPages - 1)}" th:class="${pageNumber == customers.number} ? 'active'">
+                <a th:href="@{${'/customers?page=' + pageNumber + '&size=' + customers.size + '&sortBy=' + customers.sort}}" th:text="${pageNumber + 1}"></a>
+            </li>
+            <li th:class="${customers.last} ? 'disabled'">
+                <a th:href="@{${'/customers?page=' + (customers.number + 1) + '&size=' + customers.size + '&sortBy=' + customers.sort}}" th:text="'Next'"></a>
+            </li>
+        </ul>
+    </div>
+</body>
+</html>
